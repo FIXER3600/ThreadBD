@@ -3,247 +3,90 @@ package controller;
 import java.util.concurrent.Semaphore;
 
 public class BDController extends Thread{
-    private int threadId;
-    private Semaphore semaforo;
-    private int tempoTransacaoBD;
-    private int tempoTransacaoCalc;
+    private int tempoCalc;
+    private int idThread = 0;
+    Semaphore semaforo;
 
-    public BDController(int threadId,Semaphore semaforo) {
-        this.threadId=threadId;
-        this.semaforo=semaforo;
+
+    public BDController(int idThread, Semaphore semaforo) {
+        this.idThread = idThread;
+        this.semaforo = semaforo;
     }
 
     @Override
     public void run() {
-        transacoes();
-        try{
+        Calculo();
+        try {
             semaforo.acquire();
-            fim();
-        }catch(InterruptedException e){
+            Transacao();
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             semaforo.release();
         }
+    }
+
+    private void Transacao() {
+        if (idThread % 3 == 1) {
+            for (int i = 0; i<2; i++) {
+                try {
+                    System.out.println("Transação no Banco de Dados da thread #" + idThread);
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        } else if (idThread % 3 == 2 || idThread % 3 == 0) {
+            for (int i = 0; i<3; i++) {
+                try {
+                    System.out.println("Transação no Banco de Dados da thread #" + idThread);
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
 
     }
 
-    private void fim() {
-        if(threadId%3==1) {
-            System.out.println("Fim Thread #"+threadId);
-        }else if (threadId%3==2){
-            System.out.println("Fim Thread #"+threadId);
-        }else if(threadId%3==0){
-            System.out.println("Fim Thread #"+threadId);
+    private void Calculo() {
+        if (idThread % 3 == 1) {
+            for (int i = 0; i < 2; i++) {
+                try {
+                    System.out.println("Cálculos da thread #" + idThread);
+                    tempoCalc = (int) ((Math.random() * 800) + 200);
+                    sleep((long) tempoCalc);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } else if (idThread % 3 == 2) {
+            for (int i = 0; i < 3; i++) {
+                try {
+                    System.out.println("Cálculos da thread #" + idThread);
+                    tempoCalc = (int) ((Math.random() * 1000) + 500);
+                    sleep((long) tempoCalc);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } else {
+            for (int i = 0; i < 3; i++) {
+                try {
+                    System.out.println("Cálculos da thread #" + idThread);
+                    tempoCalc = (int) ((Math.random() * 1000) + 1000);
+                    sleep((long) tempoCalc);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-    }
 
-    private void transacoes() {
-        if(threadId%3==1){
-
-            tempoTransacaoCalc = (int) ((Math.random() * 200) + 800);
-            tempoTransacaoBD = (int) ((Math.random() * 501) + 500);
-
-                int porcentual = tempoTransacaoCalc / 100;
-                int total = 0;
-                System.out.println("Cálculos da Thread #"+threadId);
-                do {
-                    try {
-                        sleep(100);
-                        if (total + porcentual >= 100) {
-                            total = 100;
-                        } else {
-                            total += porcentual;
-                        }
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total= 0;
-            System.out.println("Cálculos da Thread #"+threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-
-        }else if (threadId%3==2){
-            tempoTransacaoCalc = (int) ((Math.random() * 500) + 1000);
-            tempoTransacaoBD = (int) ((Math.random() * 750) + 750);
-            int porcentual = tempoTransacaoCalc / 100;
-            int total = 0;
-            System.out.println("Cálculos da Thread #"+threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Cálculos da Thread #"+threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-
-        }else if(threadId%3==0){
-            tempoTransacaoCalc = (int) ((Math.random() * 1000) + 1000);
-            tempoTransacaoBD = (int) ((Math.random() * 750) + 750);
-            int porcentual = tempoTransacaoCalc / 100;
-            int total = 0;
-            System.out.println("Cálculos da Thread #"+threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Cálculos da Thread #"+threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-            porcentual = tempoTransacaoCalc / 100;
-            total = 0;
-            System.out.println("Transação BD com Thread valor"+this.threadId);
-            do {
-                try {
-                    sleep(100);
-                    if (total + porcentual >= 100) {
-                        total = 100;
-                    } else {
-                        total += porcentual;
-                    }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (total < 100);
-        }
 
     }
 }
